@@ -63,7 +63,26 @@ func showOutput() {
 	fmt.Println("------------------------")
 	fmt.Println("Coordinates : Tile")
 	fmt.Println("------------------------")
+
 	for key, value := range solution {
 		fmt.Println(key, ":", value)
 	}
+
+	fmt.Println("------------------------")
+	fmt.Println("Visible bushes:")
+
+	colors := countColors(landscape)
+	meetsTarget := true
+
+	for key, value := range colors {
+		if key > 0 {
+			if colors[key] != targets[key] {
+				meetsTarget = false
+			}
+			fmt.Println(key, ":", value)
+		}
+	}
+
+	fmt.Println("------------------------")
+	fmt.Println("Meets Target:", meetsTarget)
 }

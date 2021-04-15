@@ -1,6 +1,8 @@
 package main
 
-import "strconv"
+import (
+	"strconv"
+)
 
 func backtrack(locX, locY int) bool {
 
@@ -75,8 +77,6 @@ func getNextLocation(locX, locY int) (int, int) {
 
 		if locX + 4 < len(landscape) {
 			locX += 4
-		} else {
-			locX = 0
 		}
 	}
 
