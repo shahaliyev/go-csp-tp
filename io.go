@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"fmt"
 	"os"
 	"strings"
 )
@@ -35,10 +36,17 @@ func buildFromFile(input *os.File) {
 			tokens := split(line)
 			landscape = append(landscape, tokens)
 		} else if section == "tiles" {
+
 			for _, tile := range tileNames {
 				index := strings.Index(line, tile) + len(tile) + 1
-				tiles[tile] = stringToInt(string(line[index]))
+
+				if string(line[index+1]) == "," || string(line[index+1]) == "}" {
+					tiles[tile] = stringToInt(string(line[index]))
+				} else {
+					tiles[tile] = stringToInt(string(line[index:index+2]))
+				}
 			}
+
 		} else if section == "targets" {
 			tokens := strings.Split(line, ":")
 			targets[stringToInt(tokens[0])] = stringToInt(tokens[1])
@@ -49,4 +57,13 @@ func buildFromFile(input *os.File) {
 	}
 
 	landscape = fillZeros(landscape)
+}
+
+func showOutput() {
+	fmt.Println("------------------------")
+	fmt.Println("Coordinates : Tile")
+	fmt.Println("------------------------")
+	for key, value := range solution {
+		fmt.Println(key, ":", value)
+	}
 }

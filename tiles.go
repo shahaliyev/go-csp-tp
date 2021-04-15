@@ -1,5 +1,8 @@
 package main
 
+var tileNames = [3]string{"OUTER_BOUNDARY", "EL_SHAPE", "FULL_BLOCK"}
+
+// Covers a specific row with tile
 func cover(row []int, method string) {
 	if method == "full" {
 		for i := range row {
@@ -13,7 +16,8 @@ func cover(row []int, method string) {
 	}
 }
 
-func putTile(tile string, landscape [][]int, X, Y int) [][]int {
+// Puts different types of tiles onto the landscape
+func putTile(tileName string, landscape [][]int, X, Y int) [][]int {
 	copy := copyMatrix(landscape)
 
 	rows := copy[X:X+4]
@@ -23,7 +27,7 @@ func putTile(tile string, landscape [][]int, X, Y int) [][]int {
 	row3 := rows[2][Y:Y+4]
 	row4 := rows[3][Y:Y+4]
 
-	switch tile {
+	switch tileName {
 	case "OUTER_BOUNDARY":
 		cover(row1, "full")
 		cover(row2, "both")
@@ -45,4 +49,18 @@ func putTile(tile string, landscape [][]int, X, Y int) [][]int {
 	}
 
 	return copy
+}
+
+// Checks if putting a tile is alright with constraints
+func canPutTile(tileName string, landscape [][]int, X, Y int) bool {
+	possibleLandscape := putTile(tileName, landscape, X, Y)
+	colors := countColors(possibleLandscape)
+
+	for i := 1; i <= 4; i++ {
+		if colors[i] < targets[i] {
+			return false
+		}
+	}
+
+	return true
 }

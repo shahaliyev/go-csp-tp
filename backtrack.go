@@ -1,91 +1,84 @@
 package main
 
-func canPutTile(tile string, landscape [][]int, X, Y int) bool {
-	possibleLandscape := putTile(tile, landscape, X, Y)
-	colors := countColors(possibleLandscape)
+import "strconv"
 
-	for i := 1; i <= 4; i++ {
-		if colors[i] < targets[i] {
-			return false
+func backtrack(locX, locY int) bool {
+
+	if isFound() {
+		return true
+	}
+
+	// Iterating over domains
+	for _, tileName := range tileNames {
+
+		// checking if a tile type is left
+		if tiles[tileName] == 0 {
+			continue
+		}
+
+		copy := copyMatrix(landscape)
+
+		// If putting the tile won't break the constraints
+		if canPutTile(tileName, landscape, locX, locY) {
+
+			// removing tile from the domain
+			tiles[tileName]--
+
+			// putting tile on the landscape
+			landscape = putTile(tileName, landscape, locX, locY)
+
+			// building solution map
+			solution[strconv.Itoa(locX) + " " + strconv.Itoa(locY)] = tileName
+
+			// memorizing location and getting next one
+			prevLocY, prevLocX := locY, locX
+			locX, locY = getNextLocation(locX, locY)
+
+			if backtrack(locX, locY) {
+				return true
+			}
+
+			// backtracking
+			locX, locY = prevLocX, prevLocY
+			landscape = copyMatrix(copy)
+			tiles[tileName]++
 		}
 	}
 
-	return true
+	return false
 }
 
-var locX int
-var locY int
-var iter int
-func backtrack() bool {
-	//if iter == 15 {
-	//	return true
-	//}
-	//iter++
-
+// Checks if the solution is found
+func isFound() bool {
 	colors := countColors(landscape)
-	//fmt.Println("colors: ", colors)
-
 	cnt := 0
+
 	for i := 1; i <= 4; i++ {
 		if colors[i] == targets[i] {
 			cnt++
 		}
 	}
+
 	if cnt == 4 {
 		return true
 	}
 
-	for _, tileName := range tileNames {
-		if tiles[tileName] == 0 {
-			continue
-		}
+	return false
+}
 
-		//fmt.Println("tileName: ", tileName)
+// Gets next location to put a tile
+func getNextLocation(locX, locY int) (int, int) {
+	if locY + 4 < len(landscape[0]) {
+		locY += 4
+	} else {
+		locY = 0
 
-		copy := copyMatrix(landscape)
-
-		if canPutTile(tileName, landscape, locX, locY) {
-			tiles[tileName]--
-			landscape = putTile(tileName, landscape, locX, locY)
-
-			prevLocY := locY
-			prevLocX := locX
-
-			if locY + 4 < len(landscape[0]) {
-				locY += 4
-			} else {
-				locY = 0
-
-				if locX + 4 < len(landscape) {
-					locX += 4
-				}
-			}
-
-			//for _, i := range landscape {
-			//	fmt.Println(i)
-			//}
-			//fmt.Println()
-
-			if backtrack() {
-				return true
-			}
-
-			locY = prevLocY
-			locX = prevLocX
-
-			landscape = copyMatrix(copy)
-
-			tiles[tileName]++
+		if locX + 4 < len(landscape) {
+			locX += 4
+		} else {
+			locX = 0
 		}
 	}
 
-	//fmt.Println("NOW!")
-	//fmt.Println(countColors(landscape))
-	//fmt.Println(tiles)
-	//for _, i := range landscape {
-	//	fmt.Println(i)
-	//}
-	//fmt.Println()
-
-	return false
+	return locX, locY
 }
